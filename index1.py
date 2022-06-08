@@ -1,10 +1,10 @@
 from openpyxl import Workbook, load_workbook
 wb = load_workbook("Excel/002.xlsx")
 ws=wb['Sheet1']
-panduantimu = []
-panduandaan = []
-nub = []
 def Excel():
+    panduantimu = []
+    panduandaan = []
+    nub = []
     for row in ws.rows:
         nub.append(row)
     for i in range(1, len(nub) + 1):

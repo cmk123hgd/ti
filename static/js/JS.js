@@ -20,6 +20,15 @@ var yhdabq = {} //存放选择标签
 var correct = [] //正确长度
 var error = [] //错误长度
 var arr = []   //优化数组的方法
+var duoxuanti_timu = {} //多选题题目
+var duoxuanti_A ={} //多选题A
+var duoxuanti_B = {} //多选题B
+var duoxuanti_C = {} //多选题C
+var duoxuanti_D = {} //多选题D
+var duoxuanti_daam = {} //多选题答案
+var shengcheng_daan = {} //生成的答案
+var shuruduoxuanti_daan ={} //输入的多选题答案
+var duoxuanti_value;//存放多选题临时答案
 for(var i=0;i<5;i++){
             arr.push(i);
 }
@@ -69,6 +78,22 @@ function jc(){
 			error.push("error")
 		}
 	}
+	for(var j = 0;j<Object.keys(shengcheng_daan).length;j++){
+		if(shuruduoxuanti_daan["duoxuanti"+String(j)] == "undefined"+shengcheng_daan["Mada"+String(j)]){
+			let zifuuchuan_shanchu = shuruduoxuanti_daan["duoxuanti"+String(j)].slice(9)
+			for(let r = 0;r<zifuuchuan_shanchu.length;r++){
+				console.log(zifuuchuan_shanchu.charAt(r))
+				console.log("#duoxuanti"+String(j)+"-"+String(zifuuchuan_shanchu.charAt(r))+"")
+				$("#duoxuanti"+String(j)+"-"+String(zifuuchuan_shanchu.charAt(r))+"").attr("class","btn-success")
+			}
+		}else{
+			let zifuuchuan_shanchu = shuruduoxuanti_daan["duoxuanti"+String(j)].slice(9)
+			for(let r = 0;r<zifuuchuan_shanchu.length;r++){
+				console.log(zifuuchuan_shanchu.charAt(r))
+				$("#duoxuanti"+String(j)+"-"+String(zifuuchuan_shanchu.charAt(r))+"").attr("class","btn-danger")
+			}
+		}
+}
 	$("#success").append(String(correct.length))
 	$("#error").append(String(error.length))
 	$("#zongfeng").append(String(correct.length *2))
@@ -79,6 +104,22 @@ function tjpanduan(value,id,name){
 	console.log($("#"+String(id)+"").siblings().attr("disabled",'true'))
 	shurupanduanbiaoqian[String(name)] = $("#"+String(id)+"")
 	console.log(shurupanduanbiaoqian)
+}
+function tjduoxuanti(value,id,name){
+	if(duoxuanti_value == null){
+	}else if(duoxuanti_value.length > 12){
+		duoxuanti_value = undefined	
+	}
+	if(shuruduoxuanti_daan[name] == undefined){
+		shuruduoxuanti_daan[name] = duoxuanti_value +=value
+		$("#"+id).attr("disabled","true")
+	}else if(shuruduoxuanti_daan[name].length>12){
+			duoxuanti_value = undefined	
+			shuruduoxuanti_daan[name] = undefined
+	}else{
+		shuruduoxuanti_daan[name] = duoxuanti_value +=value
+		$("#"+id).attr("disabled","true")
+	}
 }
 function tongbudata(attobjet,url){
 	$.ajax({
@@ -128,11 +169,34 @@ function tongbupanduan(attobjet,url){
 	console.log(panduantimu)
 	console.log(panduandaan)
 }
+function tianjiaduoxuanti(attobjet,url){
+	$.ajax({
+	    url: String(url)+"/zhutduoxuanti",
+	    type: 'POST',
+	    data: attobjet,
+	    async: false,
+	    cache: false,
+	    contentType: false,
+	    processData: false,
+		success:function(duoxuanti){
+			console.log(duoxuanti)
+			for(let m = 0;m<duoxuanti['duoxuanti_lenght'];m++){
+				duoxuanti_timu['duoxuanti_timu'+String(m)] = duoxuanti["duoxuanti_mu"+String(m)]
+				duoxuanti_A["duoxuanti_A"+String(m)] = duoxuanti["duoxuanti_A"+String(m)]
+				duoxuanti_B["duoxuanti_B"+String(m)] = duoxuanti["duoxuanti_B"+String(m)]
+				duoxuanti_C["duoxuanti_C"+String(m)] = duoxuanti["duoxuanti_C"+String(m)]
+				duoxuanti_D["duoxuanti_D"+String(m)] = duoxuanti["duoxuanti_D"+String(m)]
+				duoxuanti_daam["duoxuanti_daam"+String(m)] = duoxuanti["duoxuanti_daam"+String(m)]
+			}
+		},
+	});
+}
 window.onload = function(){
 	var attobj = new Object()
 	attobj.name = '张三'
 	tongbudata(attobj,window.location.href)
 	tongbupanduan(attobj,window.location.href)
+	tianjiaduoxuanti(attobj,window.location.href)
 	console.log("页面加载完毕")
 	console.log("当前一共有"+String(Object.keys(timu).length)+"题")
 	for(var i = 0;i<tmnumbers;i++){
@@ -150,7 +214,6 @@ window.onload = function(){
 	for(var j = 0;j<tmnumbers;j++){
 		tp = tp + 80
 		Mas = arr[j]
-		console.log(Mas)
 		panduanMasda["Mada"+String(j)] = panduandaan["panduandaan"+String(Mas)]
 		$("body").append("<div id ='panduan"+String(j)+"' class='timu'><div id='panduanheade"+String(j)+"'></div><div id='panduananji"+String(j)+"'></div></div>")
 		$("#panduan"+String(j)+"").css("top",tp)
@@ -159,6 +222,17 @@ window.onload = function(){
 		$("#panduananji"+String(j)+"").append("<button type='button' name='panduantimu"+String(j)+"' value='error' class='btn	btn-primary' id='panduan"+String(j)+"-error' style='margin-left: 10px;' onclick='tjpanduan(this.value,this.id,this.name)'>错误</button>")
 		
 	}
-	console.log(Masda)
-	console.log(panduanMasda)
+	for(var n = 0;n<tmnumbers;n++){
+		tp = tp + 100
+		Mas = arr[n]
+		shengcheng_daan["Mada"+String(n)] = duoxuanti_daam["duoxuanti_daam"+String(Mas)]
+		$("body").append("<div id='duoxuanti"+String(n)+"' class='timu'><div id ='duoxuanti_head"+String(n)+"'></div><div id='duoxuanti_anni"+String(n)+"'></div></div>")
+		$("#duoxuanti"+String(n)).css("top",tp)
+		$("#duoxuanti_head"+String(n)).append(duoxuanti_timu["duoxuanti_timu"+String(Mas)])
+		$("#duoxuanti_anni"+String(n)).append("<button type='button'  value='A' id = 'duoxuanti"+String(n)+"-A' name = 'duoxuanti"+String(n)+"' class='btn btn-primary' onclick='tjduoxuanti(this.value,this.id,this.name)' style='margin-left: 10px;' class = 'duoxuanti_anni'>"+String(duoxuanti_A["duoxuanti_A"+String(Mas)])+"</button>")
+		$("#duoxuanti_anni"+String(n)).append("<button type='button'  value='B' id = 'duoxuanti"+String(n)+"-B' name = 'duoxuanti"+String(n)+"' class='btn btn-primary' onclick='tjduoxuanti(this.value,this.id,this.name)' style='margin-left: 10px;' class = 'duoxuanti_anni'>"+String(duoxuanti_B["duoxuanti_B"+String(Mas)])+"</button>")
+		$("#duoxuanti_anni"+String(n)).append("<button type='button'  value='C' id = 'duoxuanti"+String(n)+"-C' name = 'duoxuanti"+String(n)+"' class='btn btn-primary' onclick='tjduoxuanti(this.value,this.id,this.name)' style='margin-left: 10px;' class = 'duoxuanti_anni'>"+String(duoxuanti_C["duoxuanti_C"+String(Mas)])+"</button>")
+		$("#duoxuanti_anni"+String(n)).append("<button type='button'  value='D' id = 'duoxuanti"+String(n)+"-D' name = 'duoxuanti"+String(n)+"' class='btn btn-primary' onclick='tjduoxuanti(this.value,this.id,this.name)' style='margin-left: 10px;' class = 'duoxuanti_anni'>"+String(duoxuanti_D["duoxuanti_D"+String(Mas)])+"</button>")
+	}
+	console.log(shengcheng_daan)
 }

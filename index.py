@@ -1,16 +1,16 @@
 from openpyxl import Workbook, load_workbook
 wb = load_workbook("Excel/001.xlsx")
 ws=wb['Sheet1']
-timu = []
-timuA = []
-timuB = []
-timeC = []
-timeD = []
-timudan = []
-nub = []
 # for i in range(0,len(doc.paragraphs)):
 #     print(doc.paragraphs[i].text)
 def Excel():
+    timu = []
+    timuA = []
+    timuB = []
+    timeC = []
+    timeD = []
+    timudan = []
+    nub = []
     for row in ws.rows:
         nub.append(row)
     for i in range(1,len(nub)+1):
